@@ -19,6 +19,7 @@ import DOMPurify from "dompurify";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import CommentModal from "@/components/CommendModal";
+import { timeAgo } from "@/globals/timeFormatter";
 
 export default function Home() {
   const [liked, setLiked] = useState(false);
@@ -37,15 +38,17 @@ export default function Home() {
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef(null);
   const [userReactions, setUserReactions] = useState({});
+  const [postID, setPostID] = useState();
 
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [currentPostComments, setCurrentPostComments] = useState([]);
 
-  const handleShowCommentModal = (comments) => {
+  const handleShowCommentModal = (comments, postID) => {
     setCurrentPostComments(comments);
+    setPostID(postID);
     setShowCommentModal(true);
 
-    console.log(comments);
+    console.log(currentPostComments);
   };
 
   const handleCloseCommentModal = () => setShowCommentModal(false);
@@ -215,24 +218,29 @@ export default function Home() {
     }
   };
 
-  const toggleLike = (postId) => {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.post_id === postId
-          ? {
-              ...post,
-              total_reactions: likedPosts[postId]
-                ? post.total_reactions - 1
-                : post.total_reactions + 1,
-            }
-          : post
-      )
-    );
+  const getComment = async (postID) => {
+    try {
+      console.log("Post ID Passed: ", postID);
+      const res = await axios.get(MAIN, {
+        params: {
+          operation: "getComment",
+          json: JSON.stringify({
+            post_id: postID,
+          }),
+        },
+      });
 
-    setLikedPosts((prevLikes) => ({
-      ...prevLikes,
-      [postId]: !prevLikes[postId],
-    }));
+      if (res.status === 200) {
+        if (res.data !== null && res.data.success) {
+          handleShowCommentModal(res.data.comments, postID);
+        } else {
+          ERROR_MESSAGE("Error", "Something went wrong fetching comments");
+          console.log("Comment Error: ", res.data);
+        }
+      } else {
+        ERROR_MESSAGE("Status Error", `${res.staus}`);
+      }
+    } catch (error) {}
   };
 
   const handleShowToast = () => {
@@ -242,31 +250,6 @@ export default function Home() {
   const handleCloseToast = () => {
     setShowToast(false);
   };
-
-  function timeAgo(date) {
-    const now = new Date();
-    const past = new Date(date);
-    const secondsAgo = Math.floor((now - past) / 1000);
-
-    const intervals = [
-      { label: "year", seconds: 31536000 },
-      { label: "month", seconds: 2592000 },
-      { label: "week", seconds: 604800 },
-      { label: "day", seconds: 86400 },
-      { label: "hour", seconds: 3600 },
-      { label: "minute", seconds: 60 },
-      { label: "second", seconds: 1 },
-    ];
-
-    for (const interval of intervals) {
-      const count = Math.floor(secondsAgo / interval.seconds);
-      if (count > 0) {
-        return `${count} ${interval.label}${count !== 1 ? "s" : ""} ago`;
-      }
-    }
-
-    return "just now";
-  }
 
   function cleanAndFormatContent(dirty) {
     const sanitizedContent = DOMPurify.sanitize(dirty);
@@ -395,7 +378,7 @@ export default function Home() {
                 <div className="content-icons">
                   <i
                     className="far fa-comment blue"
-                    onClick={() => handleShowCommentModal(post.comments)}
+                    onClick={() => getComment(post.post_id)}
                   >
                     {post.total_comments}
                   </i>
@@ -428,12 +411,15 @@ export default function Home() {
           message={toastMessage}
         />
 
-        <Trendings />
+        <Trendings currentID={currentUserID} />
 
         <CommentModal
           show={showCommentModal}
           handleClose={handleCloseCommentModal}
           comments={currentPostComments}
+          onClose={handleCloseCommentModal}
+          userid={currentUserID}
+          post_id={postID}
         />
       </div>
     </body>

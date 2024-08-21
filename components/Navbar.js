@@ -19,7 +19,7 @@ const Navbar = ({ firstname, lastname, image, username }) => {
             </a>
           </li>
 
-          <li className="nav-items">
+          {/* <li className="nav-items">
             <a href="#">
               <i className="far fa-bell"></i> Notifications
             </a>
@@ -39,7 +39,7 @@ const Navbar = ({ firstname, lastname, image, username }) => {
             <a href="#">
               <i className="far fa-user"></i> Profile
             </a>
-          </li>
+          </li> */}
         </ul>
       </div>
 
