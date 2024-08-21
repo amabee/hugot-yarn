@@ -1,8 +1,9 @@
 "use client";
+import { IMAGELINK } from "@/globals/endpoints";
 import React from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 
-const Navbar = () => {
+const Navbar = ({ firstname, lastname, image, username }) => {
   return (
     <div className="left-flex-container flex-item">
       <div className="nav-links">
@@ -43,10 +44,12 @@ const Navbar = () => {
       </div>
 
       <div className="profile-box">
-        <img src="./img/profile.jpg" alt="profile" />
+        <img src={IMAGELINK + image} alt="profile" />
         <div className="profile-link">
-          <p className="full-name">Profile</p>
-          <p className="user-name">@username</p>
+          <p className="full-name">
+            {firstname} {lastname}
+          </p>
+          <p className="user-name">@{username}</p>
         </div>
         <Dropdown>
           <Dropdown.Toggle as="a" href="#"></Dropdown.Toggle>

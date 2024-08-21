@@ -9,5 +9,5 @@ export const ERROR_MESSAGE = (title, message) => {
 };
 
 export const EXCEPTION_ERROR_MESSAGE = (message) => {
-  Swal.fire("Exception error", message, "information");
+  Swal.fire("Exception error", message, "info");
 };

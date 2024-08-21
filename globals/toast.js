@@ -55,7 +55,7 @@ function ToastNotification({ show, onClose, title, message, img }) {
               alt=""
             />
             <strong className="me-auto">{title}</strong>
-            <small>11 mins ago</small>
+            <small>Just Now</small>
           </Toast.Header>
           <Toast.Body>{message}</Toast.Body>
         </Toast>
