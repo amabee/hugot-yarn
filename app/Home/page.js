@@ -18,6 +18,7 @@ import {
 import DOMPurify from "dompurify";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
+import CommentModal from "@/components/CommendModal";
 
 export default function Home() {
   const [liked, setLiked] = useState(false);
@@ -36,6 +37,16 @@ export default function Home() {
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef(null);
   const [userReactions, setUserReactions] = useState({});
+
+  const [showCommentModal, setShowCommentModal] = useState(false);
+  const [currentPostComments, setCurrentPostComments] = useState([]);
+
+  const handleShowCommentModal = (comments) => {
+    setCurrentPostComments(comments);
+    setShowCommentModal(true);
+  };
+
+  const handleCloseCommentModal = () => setShowCommentModal(false);
 
   const router = useRouter();
 
@@ -380,7 +391,12 @@ export default function Home() {
                 </div>
 
                 <div className="content-icons">
-                  <i className="far fa-comment blue"> {post.total_comments}</i>
+                  <i
+                    className="far fa-comment blue"
+                    onClick={() => handleShowCommentModal(post.comments)}
+                  >
+                    {post.total_comments}
+                  </i>
                   <i className="fas fa-retweet green"> {post.total_shares}</i>
                   {/* Heart Icon */}
                   <i
@@ -411,6 +427,12 @@ export default function Home() {
         />
 
         <Trendings />
+
+        <CommentModal
+          show={showCommentModal}
+          handleClose={handleCloseCommentModal}
+          comments={currentPostComments}
+        />
       </div>
     </body>
   );
