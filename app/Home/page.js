@@ -44,6 +44,8 @@ export default function Home() {
   const handleShowCommentModal = (comments) => {
     setCurrentPostComments(comments);
     setShowCommentModal(true);
+
+    console.log(comments);
   };
 
   const handleCloseCommentModal = () => setShowCommentModal(false);
