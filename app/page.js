@@ -7,7 +7,7 @@ import {
   EXCEPTION_ERROR_MESSAGE,
   SUCCESS_MESSAGE,
 } from "@/globals/swal";
-import { AUTH } from "@/globals/endpoints";
+import { AUTH, MAIN } from "@/globals/endpoints";
 import axios from "axios";
 
 const AuthForm = () => {
@@ -70,6 +70,52 @@ const AuthForm = () => {
         console.log(res);
       }
     } catch (error) {}
+  };
+
+  const signup = async () => {
+    const formData = new FormData();
+
+    formData.append("operation", "signup");
+    formData.append(
+      "json",
+      JSON.stringify({
+        username: username,
+        password: password,
+        firstname: firstName,
+        lastname: lastName,
+        email: email,
+      })
+    );
+
+    formData.forEach((value, key) => {
+      console.log(key, value);
+    });
+
+    try {
+      const res = await axios({
+        url: AUTH,
+        method: "POST",
+        data: formData,
+      });
+
+      if (res.status === 200) {
+        if (res.data !== null && res.data.success) {
+          SUCCESS_MESSAGE("Success", `${res.data.success}`);
+          setFirstName("");
+          setUsername("");
+          setPassword("");
+          setEmail("");
+          setLastName("");
+          setIsLogin(true);
+        } else {
+          ERROR_MESSAGE("Error", `${res.data.error}`);
+        }
+      } else {
+        ERROR_MESSAGE("Status Error", `${res.statusText}`);
+      }
+    } catch (error) {
+      EXCEPTION_ERROR_MESSAGE(`${error}`);
+    }
   };
 
   return (
