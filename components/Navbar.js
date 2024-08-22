@@ -1,9 +1,16 @@
 "use client";
 import { IMAGELINK } from "@/globals/endpoints";
+import { useRouter } from "next/navigation";
 import React from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 
 const Navbar = ({ firstname, lastname, image, username }) => {
+  const router = useRouter();
+  const handleLogOut = () => {
+    sessionStorage.clear();
+
+    router.push("/");
+  };
   return (
     <div className="left-flex-container flex-item">
       <div className="nav-links">
@@ -54,7 +61,9 @@ const Navbar = ({ firstname, lastname, image, username }) => {
         <Dropdown>
           <Dropdown.Toggle as="a" href="#"></Dropdown.Toggle>
           <Dropdown.Menu>
-            <Dropdown.Item href="#/action-1">Log Out</Dropdown.Item>
+            <Dropdown.Item onClick={() => handleLogOut()}>
+              Log Out
+            </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       </div>

@@ -20,6 +20,7 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import CommentModal from "@/components/CommendModal";
 import { timeAgo } from "@/globals/timeFormatter";
+import Dropdown from "react-bootstrap/Dropdown";
 
 export default function Home() {
   const [liked, setLiked] = useState(false);
@@ -153,6 +154,7 @@ export default function Home() {
           handleShowToast();
           setPostContent("");
           setSelectedImage(null);
+          getPosts();
         } else {
           ERROR_MESSAGE("Error Posting", JSON.stringify(res.data));
         }
@@ -163,6 +165,40 @@ export default function Home() {
       EXCEPTION_ERROR_MESSAGE(
         "An exception error occurred while adding the post" + `${error}`
       );
+    }
+  };
+
+  const deletePost = async (postID) => {
+    const formData = new FormData();
+    formData.append("operation", "deletePost");
+    formData.append(
+      "json",
+      JSON.stringify({
+        user_id: currentUserID,
+        post_id: postID,
+      })
+    );
+
+    try {
+      const res = await axios({
+        url: MAIN,
+        method: "POST",
+        data: formData,
+      });
+
+      if (res.status === 200) {
+        if (res.data !== null && res.data.success) {
+          SUCCESS_MESSAGE("Success", "Post Deleted");
+          getPosts();
+        } else {
+          ERROR_MESSAGE("Error", "Something went wrong deleting the post");
+          console.log(res.data);
+        }
+      } else {
+        ERROR_MESSAGE("Status Error", `${res.statusText}`);
+      }
+    } catch (error) {
+      EXCEPTION_ERROR_MESSAGE(`${error}`);
     }
   };
 
@@ -234,7 +270,7 @@ export default function Home() {
         if (res.data !== null && res.data.success) {
           handleShowCommentModal(res.data.comments, postID);
         } else {
-          ERROR_MESSAGE("Error", "Something went wrong fetching comments");
+          handleShowCommentModal(res.data.comments, postID);
           console.log("Comment Error: ", res.data);
         }
       } else {
@@ -292,7 +328,7 @@ export default function Home() {
         <div className="center-flex-container flex-item">
           <div className="home">
             <h1>Home</h1>
-            <i className="fas fa-magic"></i>
+            {/* <i className="fas fa-magic"></i> */}
           </div>
 
           <div className="post-tweet">
@@ -360,10 +396,26 @@ export default function Home() {
                   </hi>
                   <p className="user-name">@{post.username}</p>
                   <p className="time"> · {timeAgo(post.created_at)}</p>
-                  <i
+
+                  {/* <i
                     className="fas fa-chevron-down ms-auto"
                     style={{ marginLeft: 0, marginRight: 10, color: "black" }}
-                  />
+                  /> */}
+                  {currentUserID === post.post_user_id ? (
+                    <Dropdown
+                      className="ms-auto"
+                      style={{ marginLeft: 0, marginRight: 10, color: "black" }}
+                    >
+                      <Dropdown.Toggle as="a"></Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        <Dropdown.Item onClick={() => deletePost(post.post_id)}>
+                          Delete Post
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  ) : (
+                    ""
+                  )}
                 </div>
 
                 <div className="user-content">
@@ -376,13 +428,17 @@ export default function Home() {
                 </div>
 
                 <div className="content-icons">
+                  {/* COMMENT ICON */}
                   <i
                     className="far fa-comment blue"
                     onClick={() => getComment(post.post_id)}
                   >
                     {post.total_comments}
                   </i>
+
+                  {/* SHARE ICON */}
                   <i className="fas fa-retweet green"> {post.total_shares}</i>
+
                   {/* Heart Icon */}
                   <i
                     className={
