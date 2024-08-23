@@ -34,6 +34,7 @@ export default function Home() {
   const [currentUserLastname, setCurrentUserLastname] = useState("");
   const [currentUserImage, setCurrentUserImage] = useState("");
   const [currentUserUsername, setCurrentUserUsername] = useState("");
+  const [currentUserEmail, setCurrentUserEmail] = useState("");
   const [posts, setPosts] = useState([]);
   const [likedPosts, setLikedPosts] = useState({});
   const [selectedImage, setSelectedImage] = useState(null);
@@ -69,6 +70,7 @@ export default function Home() {
       setCurrentUserLastname(user.lastname);
       setCurrentUserImage(user.user_image);
       setCurrentUserUsername(user.username);
+      setCurrentUserEmail(user.email);
     }
   }, [router]);
 
@@ -78,6 +80,7 @@ export default function Home() {
     currentUserImage,
     currentUserFirstname,
     currentUserLastname,
+    currentUserEmail,
   ]);
 
   const getPosts = async () => {
@@ -323,12 +326,13 @@ export default function Home() {
           lastname={currentUserLastname}
           username={currentUserUsername}
           image={currentUserImage}
+          email={currentUserEmail}
+          id={currentUserID}
         />
 
         <div className="center-flex-container flex-item">
           <div className="home">
             <h1>Home</h1>
-            {/* <i className="fas fa-magic"></i> */}
           </div>
 
           <div className="post-tweet">
@@ -384,81 +388,94 @@ export default function Home() {
             </form>
           </div>
 
-          {posts.map((post) => (
-            <div key={post.post_id} className="tweets">
-              <div className="user-pics">
-                <img src={IMAGELINK + post.user_image} alt="user3" />
-              </div>
-              <div className="user-content-box">
-                <div className="user-names">
-                  <hi className="full-name">
-                    {post.firstname} {post.lastname}
-                  </hi>
-                  <p className="user-name">@{post.username}</p>
-                  <p className="time"> · {timeAgo(post.created_at)}</p>
+          {posts.length > 0 ? (
+            posts.map((post) => (
+              <div key={post.post_id} className="tweets">
+                <div className="user-pics">
+                  <img src={IMAGELINK + post.user_image} alt="user3" />
+                </div>
+                <div className="user-content-box">
+                  <div className="user-names">
+                    <hi className="full-name">
+                      {post.firstname} {post.lastname}
+                    </hi>
+                    <p className="user-name">@{post.username}</p>
+                    <p className="time"> · {timeAgo(post.created_at)}</p>
 
-                  {/* <i
-                    className="fas fa-chevron-down ms-auto"
-                    style={{ marginLeft: 0, marginRight: 10, color: "black" }}
-                  /> */}
-                  {currentUserID === post.post_user_id ? (
-                    <Dropdown
-                      className="ms-auto"
-                      style={{ marginLeft: 0, marginRight: 10, color: "black" }}
+                    {currentUserID === post.post_user_id ? (
+                      <Dropdown
+                        className="ms-auto"
+                        style={{
+                          marginLeft: 0,
+                          marginRight: 10,
+                          color: "black",
+                        }}
+                      >
+                        <Dropdown.Toggle as="a"></Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          <Dropdown.Item
+                            onClick={() => deletePost(post.post_id)}
+                          >
+                            Delete Post
+                          </Dropdown.Item>
+                        </Dropdown.Menu>
+                      </Dropdown>
+                    ) : (
+                      ""
+                    )}
+                  </div>
+
+                  <div className="user-content">
+                    <p
+                      dangerouslySetInnerHTML={{
+                        __html: cleanAndFormatContent(post.post_content),
+                      }}
+                    />
+                    {post.image ? <img src={IMAGELINK + post.image} /> : ""}
+                  </div>
+
+                  <div className="content-icons">
+                    {/* COMMENT ICON */}
+                    <i
+                      className="far fa-comment blue"
+                      onClick={() => getComment(post.post_id)}
                     >
-                      <Dropdown.Toggle as="a"></Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item onClick={() => deletePost(post.post_id)}>
-                          Delete Post
-                        </Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  ) : (
-                    ""
-                  )}
+                      {post.total_comments}
+                    </i>
+
+                    {/* SHARE ICON */}
+                    <i className="fas fa-retweet green"> {post.total_shares}</i>
+
+                    {/* Heart Icon */}
+                    <i
+                      className={
+                        userReactions[post.post_id] === "heart"
+                          ? "fas fa-heart red"
+                          : "far fa-heart"
+                      }
+                      style={
+                        userReactions[post.post_id] === "heart"
+                          ? { color: "red", cursor: "pointer" }
+                          : { color: "gray", cursor: "pointer" }
+                      }
+                      onClick={() => likePost(post.post_id)}
+                    >
+                      {post.total_reactions}
+                    </i>
+                  </div>
                 </div>
-
-                <div className="user-content">
-                  <p
-                    dangerouslySetInnerHTML={{
-                      __html: cleanAndFormatContent(post.post_content),
-                    }}
-                  />
-                  {post.image ? <img src={IMAGELINK + post.image} /> : ""}
-                </div>
-
-                <div className="content-icons">
-                  {/* COMMENT ICON */}
-                  <i
-                    className="far fa-comment blue"
-                    onClick={() => getComment(post.post_id)}
-                  >
-                    {post.total_comments}
-                  </i>
-
-                  {/* SHARE ICON */}
-                  <i className="fas fa-retweet green"> {post.total_shares}</i>
-
-                  {/* Heart Icon */}
-                  <i
-                    className={
-                      userReactions[post.post_id] === "heart"
-                        ? "fas fa-heart red"
-                        : "far fa-heart"
-                    }
-                    style={
-                      userReactions[post.post_id] === "heart"
-                        ? { color: "red", cursor: "pointer" }
-                        : { color: "gray", cursor: "pointer" }
-                    }
-                    onClick={() => likePost(post.post_id)}
-                  >
-                    {post.total_reactions}
-                  </i>
-                </div>
+              </div>
+            ))
+          ) : (
+            <div
+              className="d-flex justify-content-center align-items-center"
+              style={{ height: "100vh" }}
+            >
+              <div className="row">
+                <h4>No content yet, try to make a post or follow someone</h4>
               </div>
             </div>
-          ))}
+          )}
         </div>
         <ToastNotification
           show={showToast}

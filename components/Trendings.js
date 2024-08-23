@@ -14,6 +14,8 @@ const Trendings = ({ currentID }) => {
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isDisplay, setIsDisplay] = useState("block");
 
   useEffect(() => {
     if (query) {
@@ -49,9 +51,22 @@ const Trendings = ({ currentID }) => {
     }
   }, [query]);
 
+  useEffect(() => {
+    handleDisplayChange();
+  }, [isSearching]);
+
+  const handleDisplayChange = () => {
+    setIsDisplay(isSearching ? "none" : "block");
+  };
+
   const handleInputChange = (e) => {
     setQuery(e.target.value);
     setShowDropdown(true);
+  };
+
+  const handleSelect = (user) => {
+    setQuery(user.username);
+    setShowDropdown(false);
   };
 
   const followUser = async (followed_id) => {
@@ -118,11 +133,6 @@ const Trendings = ({ currentID }) => {
     }
   };
 
-  const handleSelect = (user) => {
-    setQuery(user.username);
-    setShowDropdown(false);
-  };
-
   return (
     <div className="right-flex-container flex-item">
       <div className="search-box">
@@ -132,11 +142,19 @@ const Trendings = ({ currentID }) => {
           placeholder="Search Twitter"
           value={query}
           onChange={handleInputChange}
-          onFocus={() => setShowDropdown(true)}
-          onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+          onFocus={() => {
+            setShowDropdown(true);
+            setIsSearching(true);
+          }}
+          onBlur={() => {
+            setTimeout(() => {
+              setShowDropdown(false);
+              setIsSearching(false);
+            }, 200);
+          }}
         />
         {showDropdown && users.length > 0 && (
-          <div className="dropdown-menu show">
+          <div className="dropdown-menu show" style={{ zIndex: 9999 }}>
             {users.map((user) => (
               <div
                 key={user.id}
@@ -177,63 +195,62 @@ const Trendings = ({ currentID }) => {
         )}
       </div>
 
-      <div class="trends">
+      <div className="trends" style={{ display: isDisplay }}>
         <ul>
-          <li class="nav-list header" />
+          <li className="nav-list header" />
           <h2>Trends for you</h2>
-          <i class="fas fa-cog"></i>
-          <li class="nav-list">
-            <div class="trend-list">
-              <p class="sub-text">Trending in Naija</p>
-              <p class="main-text">#BBNaija</p>
-              <p class="sub-text">274K Tweets</p>
+          <i className="fas fa-cog"></i>
+          <li className="nav-list">
+            <div className="trend-list">
+              <p className="sub-text">Trending in Naija</p>
+              <p className="main-text">#BBNaija</p>
+              <p className="sub-text">274K Tweets</p>
             </div>
-            <div class="trend-icon">
-              <i class="fas fa-chevron-down"></i>
-            </div>
-          </li>
-          <li class="nav-list">
-            <div class="trend-list">
-              <p class="sub-text">Trending in Naija</p>
-              <p class="main-text">#TaylorSwift</p>
-              <p class="sub-text">154K Tweets</p>
-            </div>
-            <div class="trend-icon">
-              <i class="fas fa-chevron-down"></i>
+            <div className="trend-icon">
+              <i className="fas fa-chevron-down"></i>
             </div>
           </li>
-          <li class="nav-list">
-            <div class="trend-list">
-              <p class="sub-text">Trending in Naija</p>
-              <p class="main-text">#Lover</p>
-              <p class="sub-text">135K Tweets</p>
+          <li className="nav-list">
+            <div className="trend-list">
+              <p className="sub-text">Trending in Naija</p>
+              <p className="main-text">#TaylorSwift</p>
+              <p className="sub-text">154K Tweets</p>
             </div>
-            <div class="trend-icon">
-              <i class="fas fa-chevron-down"></i>
-            </div>
-          </li>
-          <li class="nav-list">
-            <div class="trend-list">
-              <p class="sub-text">Trending in Naija</p>
-              <p class="main-text">#Dora</p>
-              <p class="sub-text">124K Tweets</p>
-            </div>
-            <div class="trend-icon">
-              <i class="fas fa-chevron-down"></i>
+            <div className="trend-icon">
+              <i className="fas fa-chevron-down"></i>
             </div>
           </li>
-          <li class="nav-list">
-            <div class="trend-list">
-              <p class="sub-text">Trending in Naija</p>
-              <p class="main-text">#TGIF</p>
-              <p class="sub-text">43K Tweets</p>
+          <li className="nav-list">
+            <div className="trend-list">
+              <p className="sub-text">Trending in Naija</p>
+              <p className="main-text">#Lover</p>
+              <p className="sub-text">135K Tweets</p>
             </div>
-            <div class="trend-icon">
-              <i class="fas fa-chevron-down"></i>
+            <div className="trend-icon">
+              <i className="fas fa-chevron-down"></i>
             </div>
           </li>
-
-          <li class="nav-list">
+          <li className="nav-list">
+            <div className="trend-list">
+              <p className="sub-text">Trending in Naija</p>
+              <p className="main-text">#Dora</p>
+              <p className="sub-text">124K Tweets</p>
+            </div>
+            <div className="trend-icon">
+              <i className="fas fa-chevron-down"></i>
+            </div>
+          </li>
+          <li className="nav-list">
+            <div className="trend-list">
+              <p className="sub-text">Trending in Naija</p>
+              <p className="main-text">#TGIF</p>
+              <p className="sub-text">43K Tweets</p>
+            </div>
+            <div className="trend-icon">
+              <i className="fas fa-chevron-down"></i>
+            </div>
+          </li>
+          <li className="nav-list">
             <a href="#">Show more</a>
           </li>
         </ul>

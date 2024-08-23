@@ -7,7 +7,7 @@
     right: 0;
     max-height: 200px;
     overflow-y: auto;
-    z-index: 1000;
+    z-index: 10000;
     border: 1px solid #ccc;
     border-radius: 4px;
     background-color: #fff;
@@ -33,9 +33,5 @@
   
   .dropdown-item span {
     flex: 1;
-  }
-  
-  .dropdown-item button {
-    margin-left: auto;
   }
   
